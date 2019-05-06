@@ -1,5 +1,7 @@
 import 'package:bubble_bottom_bar/bubble_bottom_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:sales_mgmt/bloc/stats_bloc_provider..dart';
+import 'package:sales_mgmt/bloc/team_bloc_provider.dart';
 import 'package:sales_mgmt/constants.dart';
 import 'package:sales_mgmt/screens/goal_screen.dart';
 import 'package:sales_mgmt/screens/profile_screen.dart';
@@ -23,8 +25,9 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  StatsBloc statsBloc;
+  TeamBloc teamBloc;
   int selection = 0;
-  AppBloc appBloc;
 
   @override
   void initState() {
@@ -33,20 +36,23 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   void didChangeDependencies() {
-    appBloc = AppBlocProvider.of(context);
+    statsBloc = StatsBlocProvider.of(context);
+    teamBloc = TeamBlocProvider.of(context);
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    appBloc.dispose();
     widget._pageController.dispose();
     widget._controller.dispose();
+    statsBloc.dispose();
+    teamBloc.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    print("lets render the build method");
     return Scaffold(
       body: NestedScrollView(
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -57,7 +63,7 @@ class _DashboardState extends State<Dashboard> {
               pinned: true,
               snap: true,
               centerTitle: selection == 0,
-              // title: getTitle(),
+              title: getTitle(),
               flexibleSpace: FlexibleSpaceBar(
                 background: Image.asset(
                   "assets/image1.jpeg",
@@ -83,7 +89,7 @@ class _DashboardState extends State<Dashboard> {
               Icons.person,
               color: Colors.red,
             ),
-            title: Text("GOAL"),
+            title: Text('Goals'),
           ),
           BubbleBottomBarItem(
             backgroundColor: Colors.deepPurple,
@@ -116,33 +122,26 @@ class _DashboardState extends State<Dashboard> {
             title: Text("PROFILE"),
           ),
         ],
-        onTap: (index) {
-          setState(() {
-            selection = index;
-          });
-          widget._pageController.animateToPage(index,
-              duration: Duration(milliseconds: 500), curve: Curves.ease);
-        },
+        onTap: (index) => widget._pageController.animateToPage(index,
+            duration: Duration(milliseconds: 500), curve: Curves.ease),
       ),
     );
   }
 
   Widget getBody() {
-    return Center(child: getTitle());
-    // return PageView(
-    //   children: widget._pages,
-    //   pageSnapping: true,
-    //   controller: widget._pageController,
-    //   onPageChanged: (int index) {
-    //     setState(() {
-    //       selection = index;
-    //     });
-    //   },
-    // );
+    print("lets render the body");
+    return PageView(
+      children: widget._pages,
+      pageSnapping: true,
+      controller: widget._pageController,
+      onPageChanged: (index) => setState(() {
+            selection = index;
+          }),
+    );
   }
 
   Widget getTitle() {
-    print("gettitle $selection");
+    print("lets render the get title");
     switch (selection) {
       case 0:
         return TextField(
@@ -154,13 +153,13 @@ class _DashboardState extends State<Dashboard> {
         break;
 
       case 1:
+        print('lets render the row');
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             StreamBuilder<String>(
-              stream: appBloc.statsMonth,
-              initialData: "Baisakh",
+              stream: statsBloc.statsMonth,
               builder: (context, snapshot) {
                 if (!snapshot.hasData)
                   print("no data snapshot of stats is ${snapshot.data}");
@@ -174,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
                       .toList(),
                   onChanged: (selectedM) {
                     print("onchange from stats");
-                    appBloc.selectStatMonth(selectedM);
+                    statsBloc.selectStatMonth(selectedM);
                   },
                 );
               },
@@ -184,14 +183,14 @@ class _DashboardState extends State<Dashboard> {
         );
         break;
 
-      case 3:
+      case 2:
         return Row(
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             StreamBuilder<String>(
-              stream: appBloc.demo,
+              stream: teamBloc.demo,
               initialData: "1",
               builder: (context, snapshot) {
                 print("snapshot of teams ${snapshot.data}");
@@ -207,13 +206,13 @@ class _DashboardState extends State<Dashboard> {
                   onChanged: (teamN) {
                     print("onchange from team name");
 
-                    appBloc.selectInt(teamN);
+                    teamBloc.selectInt(teamN);
                   },
                 );
               },
             ),
             StreamBuilder<String>(
-              stream: appBloc.teamsMonth,
+              stream: teamBloc.teamsMonth,
               initialData: "Baisakh",
               builder: (context, snapshot) {
                 print("snapshot of month ${snapshot.data}");
@@ -226,7 +225,7 @@ class _DashboardState extends State<Dashboard> {
                   onChanged: (selectedM) {
                     print("onchange from month team");
 
-                    appBloc.selectTeamMonth(selectedM);
+                    teamBloc.selectTeamMonth(selectedM);
                   },
                 );
               },

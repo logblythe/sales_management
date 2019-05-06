@@ -19,7 +19,6 @@ class GoalScreen extends StatefulWidget {
 class _GoalScreenState extends State<GoalScreen>
     with AutomaticKeepAliveClientMixin, TickerProviderStateMixin {
   bool dec = false;
-  AppBloc appBloc;
   File imageFile;
   int achieved = 0;
   int total = 100;
@@ -59,8 +58,8 @@ class _GoalScreenState extends State<GoalScreen>
 
   @override
   void didChangeDependencies() {
-    appBloc = AppBlocProvider.of(context);
-    appBloc.fetchImages();
+    // appBloc = AppBlocProvider.of(context);
+    // appBloc.fetchImages();
     super.didChangeDependencies();
   }
 
@@ -154,37 +153,37 @@ class _GoalScreenState extends State<GoalScreen>
   }
 
   Widget _buildCarousel() {
-    return StreamBuilder<List<ImageModel>>(
-      stream: appBloc.imageStream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data == []) {
-          return carouselCard(
-            child: IconButton(
-              icon: Icon(Icons.add_a_photo),
-              onPressed: () => pickImageFromGallery(ImageSource.gallery),
-            ),
-          );
-        }
-        return CarouselWithIndicator(
-          child: snapshot.data.map((i) {
-            if (!i.isImage) {
-              return carouselCard(
-                child: IconButton(
-                  icon: Icon(Icons.add_a_photo),
-                  onPressed: () => pickImageFromGallery(ImageSource.gallery),
-                ),
-              );
-            } else {
-              return carouselCard(
-                child: (i.isAsset)
-                    ? Image.asset(i.imagePath, fit: BoxFit.fill)
-                    : Image.file(File(i.imagePath), fit: BoxFit.fill),
-              );
-            }
-          }).toList(),
-        );
-      },
-    );
+    // return StreamBuilder<List<ImageModel>>(
+    //   stream: appBloc.imageStream,
+    //   builder: (context, snapshot) {
+    //     if (!snapshot.hasData || snapshot.data == []) {
+    //       return carouselCard(
+    //         child: IconButton(
+    //           icon: Icon(Icons.add_a_photo),
+    //           onPressed: () => pickImageFromGallery(ImageSource.gallery),
+    //         ),
+    //       );
+    //     }
+    //     return CarouselWithIndicator(
+    //       child: snapshot.data.map((i) {
+    //         if (!i.isImage) {
+    //           return carouselCard(
+    //             child: IconButton(
+    //               icon: Icon(Icons.add_a_photo),
+    //               onPressed: () => pickImageFromGallery(ImageSource.gallery),
+    //             ),
+    //           );
+    //         } else {
+    //           return carouselCard(
+    //             child: (i.isAsset)
+    //                 ? Image.asset(i.imagePath, fit: BoxFit.fill)
+    //                 : Image.file(File(i.imagePath), fit: BoxFit.fill),
+    //           );
+    //         }
+    //       }).toList(),
+    //     );
+    //   },
+    // );
   }
 
   Widget _buildSales() {
@@ -282,7 +281,7 @@ class _GoalScreenState extends State<GoalScreen>
 
   pickImageFromGallery(ImageSource source) async {
     imageFile = await ImagePicker.pickImage(source: source);
-    appBloc.insertImage(imageFile.path);
+    // appBloc.insertImage(imageFile.path);
   }
 
   Future<void> _selectDate(BuildContext context) async {

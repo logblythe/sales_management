@@ -48,7 +48,7 @@ class AppBloc {
     if (prefs != null) return prefs;
     prefs = await initSharedPref();
     return prefs;
-  }
+  } 
 
   ImageRepo _imageRepo = ImageRepo();
 
